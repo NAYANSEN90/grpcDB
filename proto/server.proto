@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package dbdriver;
+
+message GetCmdIn {
+    string key   = 1;
+}
+message GetCmdOut {
+    string key   = 1;
+    string value = 2;
+}
+
+message SetCmdIn {
+    string key   = 1;
+    string value = 2;
+}
+
+message SetCmdOut {
+    bool err = 1;
+}
+
+service GrpcDBServer {
+    rpc Get (GetCmdIn) returns (GetCmdOut) {}
+    rpc Set (SetCmdIn) returns (SetCmdOut) {}
+}
