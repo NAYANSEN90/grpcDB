@@ -5,37 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-
-	"github.com/syndtr/goleveldb/leveldb"
-	"github.com/syndtr/goleveldb/leveldb/filter"
-	"github.com/syndtr/goleveldb/leveldb/opt"
 )
 
-var storage *leveldb.DB = nil
-var defaultConfig *Configuration = nil
+var defaultConfig    *Configuration = nil
 
 //go:generate protoc -I proto/ proto/server.proto --go_out=plugins=grpc:protogo
 
-func init() {
-	options := &opt.Options{
-		Filter: filter.NewBloomFilter(10),
-	}
-	database, err := leveldb.OpenFile("levelR.db", options)
-	if nil != err {
-		database, err = leveldb.RecoverFile("levelR.db", options)
-	}
-	if nil == err {
-		storage = database
-	} else {
-		os.Exit(-1)
-	}
-}
-
-func closeDB() {
-	if storage != nil {
-		storage.Close()
-	}
-}
 
 //Configuration holds the configuration for redis, leveldb and grpc server
 type Configuration struct {
@@ -56,6 +31,8 @@ func parseConfig() Configuration {
 
 	var config Configuration
 	json.Unmarshal(raw, &config)
+	fmt.Println(config)
+
 	return config
 }
 
@@ -66,5 +43,11 @@ func main() {
 		LevelDBConfig{database: "levelR.db"},
 		GrpcConfig{host: "127.0.0.1", port: 9999}})
 
-	fmt.Println(defaultConfig.redis.host)
+	initRedisClient(defaultConfig)
+	initLevelDBClient(defaultConfig)
+	initGrpcServer(defaultConfig)
+
+	defer closeRedisDBClient()
+	defer closeLevelDBClient()
+	defer shutdownGrpcServer()
 }
