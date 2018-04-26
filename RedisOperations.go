@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var redisConnection  *redis.Client  = nil
+var redisConnection *redis.Client = nil
 
 //RedisConfig defines the parameters required to make a redis server connection
 type RedisConfig struct {
@@ -16,28 +16,15 @@ type RedisConfig struct {
 	pass string
 }
 
-
-func callGet(key string) (string, error) {
-
-	if nil != redisConnection {
-		resp,err := redisConnection.Get(key).Result()
-		if nil != err {
-			return resp, nil
-		}
-	}
-	return  "", fmt.Errorf("not found")
-}
-
-
-func initRedisClient(config * Configuration){
+func initRedisClient(config *Configuration) {
 	var address string
-	address  = fmt.Sprintf("%s:%d" , config.redis.host , config.redis.port)
-	fmt.Printf("Connecting to redis server %s\n" , address)
+	address = fmt.Sprintf("%s:%d", config.redis.host, config.redis.port)
+	fmt.Printf("Connecting to redis server %s\n", address)
 
 	client := redis.NewClient(&redis.Options{
-		Addr: address,
+		Addr:     address,
 		Password: "",
-		DB: 0,
+		DB:       0,
 	})
 
 	pong, err := client.Ping().Result()

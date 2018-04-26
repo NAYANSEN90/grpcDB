@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/syndtr/goleveldb/leveldb"
-	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/filter"
+	"github.com/syndtr/goleveldb/leveldb/opt"
 	"os"
 )
 
-var storage          *leveldb.DB    = nil
+var storage *leveldb.DB = nil
 
 type LevelDBConfig struct {
 	database string
@@ -30,6 +30,28 @@ func initLevelDBClient(config *Configuration) {
 	}
 }
 
+func callGet(key string) (string, error) {
+
+	if nil != storage {
+		val, err := storage.Get([]byte(key), nil)
+		if nil != err {
+			return "", err
+		}
+		return string(val), nil
+	}
+	return "", fmt.Errorf("db not found")
+}
+
+func callSet(key string, value string) error {
+	if nil != storage {
+		err := storage.Put([]byte(key), []byte(value), &opt.WriteOptions{Sync: true})
+		if nil != err {
+			return err
+		}
+		return nil
+	}
+	return fmt.Errorf("db not found")
+}
 
 func closeLevelDBClient() {
 	if storage != nil {

@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"dbdriver/protogo"
-	"net"
 	"fmt"
 	"google.golang.org/grpc"
+	"net"
+	"nrxen.com/dbdriver/protogo"
 	"os"
 )
 
@@ -19,18 +19,17 @@ type GrpcConfig struct {
 
 //An abstraction of the server, allowing to attach the grpc call functions
 type GrpcDBServer struct {
-
 }
 
 //override the interface functions (in server .pb.go)
-func (s *GrpcDBServer) Get(ctx context.Context , in *dbdriver.GetCmdIn) (*dbdriver.GetCmdOut, error) {
+func (s *GrpcDBServer) Get(ctx context.Context, in *dbdriver.GetCmdIn) (*dbdriver.GetCmdOut, error) {
 	fmt.Printf("Get Key : %s \n", in.Key)
 	str, err := callGet(in.Key)
 	if err != nil {
 		fmt.Println(err)
-		return &dbdriver.GetCmdOut{ Key: in.Key,  Value: ""}, fmt.Errorf("not found")
+		return &dbdriver.GetCmdOut{Key: in.Key, Value: ""}, fmt.Errorf("not found")
 	}
-	return &dbdriver.GetCmdOut{ Key : in.Key, Value: str}, nil
+	return &dbdriver.GetCmdOut{Key: in.Key, Value: str}, nil
 }
 
 //override the interface functions (in server.pb.go)
@@ -47,7 +46,7 @@ func initGrpcServer(config *Configuration) {
 	}
 
 	// create a dummy of the abstracted server struct
-	s := GrpcDBServer {}
+	s := GrpcDBServer{}
 
 	//create a grpc server, that will listen
 	server := grpc.NewServer()
@@ -67,6 +66,3 @@ func shutdownGrpcServer() {
 		server.Stop()
 	}
 }
-
-
-
